@@ -1,1 +1,9 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&display=swap');
+
+.font-chinese {
+  font-family: "Noto Serif SC", serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}

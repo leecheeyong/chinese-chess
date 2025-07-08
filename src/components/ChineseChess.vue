@@ -10,10 +10,40 @@ const possibleMoves = ref([])
 const lastMove = ref(null)
 const capturedPieces = ref({ red: [], black: [] })
 
+const initializeBoard = () => {
+  const board = Array(10).fill(null).map(() => Array(9).fill(null))
+  board[9] = ['车', '马', '象', '仕', '帅', '仕', '象', '马', '车']
+  board[8] = [null, null, null, null, null, null, null, null, null]
+  board[7] = [null, '炮', null, null, null, null, null, '炮', null]
+  board[6] = ['兵', null, '兵', null, '兵', null, '兵', null, '兵']
+  for (let i = 2; i < 6; i++) {
+    board[i] = Array(9).fill(null)
+  }
+  board[3] = ['卒', null, '卒', null, '卒', null, '卒', null, '卒']
+  board[2] = [null, '砲', null, null, null, null, null, '砲', null]
+  board[1] = [null, null, null, null, null, null, null, null, null]
+  board[0] = ['俥', '傌', '相', '士', '將', '士', '相', '傌', '俥']
+  return board
+}
 
 gameBoard.value = initializeBoard()
 
-
+const pieceDisplay = {
+  '帅': { char: '帥', color: 'red', type: 'king', name: 'King' },
+  '仕': { char: '仕', color: 'red', type: 'advisor', name: 'Advisor' },
+  '象': { char: '象', color: 'red', type: 'elephant', name: 'Elephant' },
+  '马': { char: '馬', color: 'red', type: 'horse', name: 'Horse' },
+  '车': { char: '車', color: 'red', type: 'chariot', name: 'Chariot' },
+  '炮': { char: '炮', color: 'red', type: 'cannon', name: 'Cannon' },
+  '兵': { char: '兵', color: 'red', type: 'soldier', name: 'Soldier' },
+  '將': { char: '將', color: 'black', type: 'king', name: 'General' },
+  '士': { char: '士', color: 'black', type: 'advisor', name: 'Advisor' },
+  '相': { char: '相', color: 'black', type: 'elephant', name: 'Minister' },
+  '傌': { char: '傌', color: 'black', type: 'horse', name: 'Horse' },
+  '俥': { char: '俥', color: 'black', type: 'chariot', name: 'Chariot' },
+  '砲': { char: '砲', color: 'black', type: 'cannon', name: 'Cannon' },
+  '卒': { char: '卒', color: 'black', type: 'soldier', name: 'Pawn' }
+}
 
 const getPieceColor = (piece) => {
   if (!piece) return null
@@ -328,39 +358,165 @@ const currentPlayerInCheck = computed(() => {
 </script>
 
 <template>
-  <div class="w-full max-w-7xl mx-auto px-2 sm:px-4">
+  <div class="w-full max-w-7xl mx-auto px-6 sm:px-4">
     <div class="block lg:hidden space-y-4">
       <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-       
+        <div class="text-center">
+          <div class="text-sm text-slate-300 mb-1">Current Turn</div>
+          <div class="text-xl font-bold mb-1" :class="currentPlayer === 'red' ? 'text-red-400' : 'text-slate-300'">
+            {{ currentPlayer === 'red' ? '红方 Red' : '黑方 Black' }}
+          </div>
+          <div class="text-xs text-slate-400">Move {{ gameHistory.length + 1 }}</div>
+          <div v-if="currentPlayerInCheck" class="mt-1 text-yellow-400 font-semibold animate-pulse text-sm">
+            ⚠️ CHECK!
+          </div>
+        </div>
       </div>
-      <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20">
+      <!-- <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20"> -->
+        <div>
         <div class="flex justify-center">
           <div class="inline-block bg-amber-100 rounded-lg p-2 shadow-2xl">
             <div class="grid grid-cols-9 gap-0 border-2 border-amber-900 rounded-lg overflow-hidden">
-             
+              <template v-for="(row, rowIndex) in gameBoard" :key="rowIndex">
+                <div 
+                  v-for="(cell, colIndex) in row" 
+                  :key="`${rowIndex}-${colIndex}`"
+                  :class="getCellClass(rowIndex, colIndex)"
+                  @click="handleCellClick(rowIndex, colIndex)"
+                >
+                  <div v-if="cell" :class="getPieceClass(cell) + ' font-chinese'">
+                    {{ pieceDisplay[cell]?.char || cell }}
+                  </div>
+                  <div v-if="isPossibleMove(rowIndex, colIndex) && !cell" 
+                       class="absolute inset-0 flex items-center justify-center">
+                    <div class="w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full opacity-70"></div>
+                  </div>
+                  <div v-if="!cell && !isPossibleMove(rowIndex, colIndex)" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div v-if="(rowIndex === 0 || rowIndex === 2 || rowIndex === 7 || rowIndex === 9) && (colIndex === 3 || colIndex === 5)"
+                         class="absolute inset-0">
+                      <svg class="w-full h-full" viewBox="0 0 56 56">
+                        <line x1="0" y1="0" x2="56" y2="56" stroke="#92400e" stroke-width="1" opacity="0.3"/>
+                        <line x1="56" y1="0" x2="0" y2="56" stroke="#92400e" stroke-width="1" opacity="0.3"/>
+                      </svg>
+                    </div>
+                    <div v-if="rowIndex === 4 && colIndex === 1" class="text-xs text-blue-700 font-bold rotate-180">
+                      楚河
+                    </div>
+                    <div v-if="rowIndex === 5 && colIndex === 7" class="text-xs text-blue-700 font-bold">
+                      汉界
+                    </div>
+                  </div>
+                </div>
+              </template>
             </div>
           </div>
         </div>
       </div>
       <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-        
-        
-        
-       
+        <div class="grid grid-cols-2 gap-3">
+          <button 
+            @click="resetGame"
+            class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors duration-200 shadow-lg text-sm"
+          >
+            🔄 New Game
+          </button>
+          <button 
+            @click="undoMove"
+            :disabled="gameHistory.length === 0"
+            class="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold transition-colors duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+          >
+            ↶ Undo
+          </button>
+        </div>
+      </div>
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+        <div class="mb-3">
+          <div class="text-xs text-slate-300 mb-2">Black pieces captured:</div>
+          <div class="flex flex-wrap gap-1">
+            <span 
+              v-for="(piece, index) in capturedPieces.black" 
+              :key="`black-${index}`"
+              class="text-sm bg-gradient-to-br from-gray-700 to-gray-900 text-white rounded-full w-6 h-6 flex items-center justify-center border border-gray-900 font-chinese"
+            >
+              {{ pieceDisplay[piece]?.char }}
+            </span>
+            <span v-if="capturedPieces.black.length === 0" class="text-slate-400 text-xs">None</span>
+          </div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-300 mb-2">Red pieces captured:</div>
+          <div class="flex flex-wrap gap-1">
+            <span 
+              v-for="(piece, index) in capturedPieces.red" 
+              :key="`red-${index}`"
+              class="text-sm bg-gradient-to-br from-red-500 to-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center border border-red-800 font-chinese"
+            >
+              {{ pieceDisplay[piece]?.char }}
+            </span>
+            <span v-if="capturedPieces.red.length === 0" class="text-slate-400 text-xs">None</span>
+          </div>
+        </div>
       </div>
     </div>
     <div class="hidden lg:grid lg:grid-cols-4 gap-6">
       <div class="space-y-6">
-        
-      
-        
-    
         <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-          
-          
-        
-          
-          
+          <div class="text-center">
+            <div class="text-sm text-slate-300 mb-2">Current Turn</div>
+            <div class="text-2xl font-bold mb-2" :class="currentPlayer === 'red' ? 'text-red-400' : 'text-slate-300'">
+              {{ currentPlayer === 'red' ? '红方 Red' : '黑方 Black' }}
+            </div>
+            <div class="text-sm text-slate-400">Move {{ gameHistory.length + 1 }}</div>
+            <div v-if="currentPlayerInCheck" class="mt-2 text-yellow-400 font-semibold animate-pulse">
+              ⚠️ CHECK!
+            </div>
+          </div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+          <div class="space-y-3">
+            <button 
+              @click="resetGame"
+              class="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors duration-200 shadow-lg"
+            >
+              🔄 New Game
+            </button>
+            <button 
+              @click="undoMove"
+              :disabled="gameHistory.length === 0"
+              class="w-full px-4 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold transition-colors duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              ↶ Undo Move
+            </button>
+          </div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+          <h3 class="text-lg font-semibold text-white mb-4">Captured Pieces</h3>
+          <div class="mb-4">
+            <div class="text-sm text-slate-300 mb-2">Black pieces captured:</div>
+            <div class="flex flex-wrap gap-2">
+              <div 
+                v-for="(piece, index) in capturedPieces.black" 
+                :key="`black-${index}`"
+                class="bg-gradient-to-br from-gray-700 to-gray-900 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold border-2 border-gray-900 shadow-lg font-chinese"
+              >
+                {{ pieceDisplay[piece]?.char }}
+              </div>
+              <span v-if="capturedPieces.black.length === 0" class="text-slate-400 text-sm">None</span>
+            </div>
+          </div>
+          <div>
+            <div class="text-sm text-slate-300 mb-2">Red pieces captured:</div>
+            <div class="flex flex-wrap gap-2">
+              <div 
+                v-for="(piece, index) in capturedPieces.red" 
+                :key="`red-${index}`"
+                class="bg-gradient-to-br from-red-500 to-red-700 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold border-2 border-red-800 shadow-lg font-chinese"
+              >
+                {{ pieceDisplay[piece]?.char }}
+              </div>
+              <span v-if="capturedPieces.red.length === 0" class="text-slate-400 text-sm">None</span>
+            </div>
+          </div>
         </div>
       </div>
       <div class="lg:col-span-2">
@@ -375,8 +531,9 @@ const currentPlayerInCheck = computed(() => {
                     :class="getCellClass(rowIndex, colIndex)"
                     @click="handleCellClick(rowIndex, colIndex)"
                   >
-                    
-                  
+                    <div v-if="cell" :class="getPieceClass(cell) + ' font-chinese'">
+                      {{ pieceDisplay[cell]?.char || cell }}
+                    </div>
                     <div v-if="isPossibleMove(rowIndex, colIndex) && !cell" 
                          class="absolute inset-0 flex items-center justify-center">
                       <div class="w-3 h-3 bg-green-500 rounded-full opacity-70"></div>
@@ -405,8 +562,19 @@ const currentPlayerInCheck = computed(() => {
       </div>
       <div>
         <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+          <h3 class="text-lg font-semibold text-white mb-4">Move Log</h3>
+          <div class="text-sm text-slate-300 space-y-2 max-h-96 overflow-y-auto">
+            <div v-if="gameHistory.length === 0" class="text-slate-400">No moves yet.</div>
+            <div v-for="(move, idx) in gameHistory" :key="idx" class="flex items-center gap-2">
+              <span class="text-xs text-slate-400 w-6">#{{ idx + 1 }}</span>
+              <span :class="move.player === 'red' ? 'text-red-400' : 'text-slate-300'" class="font-bold">{{ move.player === 'red' ? '红' : '黑' }}</span>
+              <span>{{ pieceDisplay[move.piece]?.char || move.piece }}</span>
+              <span class="text-xs">({{ move.from[0] }},{{ move.from[1] }}) → ({{ move.to[0] }},{{ move.to[1] }})</span>
+              <span v-if="move.captured" class="ml-2 text-yellow-400 font-chinese">× {{ pieceDisplay[move.captured]?.char || move.captured }}</span>
+            </div>
           </div>
-          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
