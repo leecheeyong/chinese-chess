@@ -396,15 +396,19 @@ const currentPlayerInCheck = computed(() => {
 });
 
 const moveLogText = computed(() => {
-  if (!gameHistory.value.length) return 'No moves yet.';
-  return gameHistory.value.map((move, idx) => {
-    const player = move.player === 'red' ? '红' : '黑';
-    const piece = pieceDisplay[move.piece]?.char || move.piece;
-    const from = `(${move.from[0]},${move.from[1]})`;
-    const to = `(${move.to[0]},${move.to[1]})`;
-    const captured = move.captured ? ` ×${pieceDisplay[move.captured]?.char || move.captured}` : '';
-    return `#${idx + 1} ${player} ${piece} ${from} → ${to}${captured}`;
-  }).join('\n');
+  if (!gameHistory.value.length) return "No moves yet.";
+  return gameHistory.value
+    .map((move, idx) => {
+      const player = move.player === "red" ? "红" : "黑";
+      const piece = pieceDisplay[move.piece]?.char || move.piece;
+      const from = `(${move.from[0]},${move.from[1]})`;
+      const to = `(${move.to[0]},${move.to[1]})`;
+      const captured = move.captured
+        ? ` ×${pieceDisplay[move.captured]?.char || move.captured}`
+        : "";
+      return `#${idx + 1} ${player} ${piece} ${from} → ${to}${captured}`;
+    })
+    .join("\n");
 });
 </script>
 
@@ -579,15 +583,33 @@ const moveLogText = computed(() => {
         </div>
       </div>
       <div class="flex justify-end">
-        <button @click="showMoveLogMobile = true" class="px-3 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-lg font-semibold transition-colors duration-200 shadow text-sm">
+        <button
+          @click="showMoveLogMobile = true"
+          class="px-3 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-lg font-semibold transition-colors duration-200 shadow text-sm"
+        >
           📋 View Move Log
         </button>
       </div>
-      <div v-if="showMoveLogMobile" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-20 transition-all">
-        <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-md w-[90vw] relative flex flex-col items-stretch">
-          <button @click="showMoveLogMobile = false" class="absolute top-3 right-3 text-gray-500 hover:text-red-500 text-3xl font-bold leading-none focus:outline-none transition-colors">×</button>
-          <h3 class="text-xl font-semibold text-gray-800 mb-4 text-center">Move Log</h3>
-          <pre class="whitespace-pre-wrap text-base text-gray-800 select-all bg-gray-100 rounded-lg p-3 max-h-72 overflow-y-auto mb-4 border border-gray-200">{{ moveLogText }}</pre>
+      <div
+        v-if="showMoveLogMobile"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-20 transition-all"
+      >
+        <div
+          class="bg-white rounded-2xl shadow-2xl p-6 max-w-md w-[90vw] relative flex flex-col items-stretch"
+        >
+          <button
+            @click="showMoveLogMobile = false"
+            class="absolute top-3 right-3 text-gray-500 hover:text-red-500 text-3xl font-bold leading-none focus:outline-none transition-colors"
+          >
+            ×
+          </button>
+          <h3 class="text-xl font-semibold text-gray-800 mb-4 text-center">
+            Move Log
+          </h3>
+          <pre
+            class="whitespace-pre-wrap text-base text-gray-800 select-all bg-gray-100 rounded-lg p-3 max-h-72 overflow-y-auto mb-4 border border-gray-200"
+            >{{ moveLogText }}</pre
+          >
         </div>
       </div>
     </div>
@@ -768,7 +790,10 @@ const moveLogText = computed(() => {
           class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20"
         >
           <h3 class="text-lg font-semibold text-white mb-4">Move Log</h3>
-          <pre class="whitespace-pre-wrap text-sm text-slate-300 select-all bg-black/10 rounded p-2 max-h-96 overflow-y-auto">{{ moveLogText }}</pre>
+          <pre
+            class="whitespace-pre-wrap text-sm text-slate-300 select-all bg-black/10 rounded p-2 max-h-96 overflow-y-auto"
+            >{{ moveLogText }}</pre
+          >
         </div>
         <div
           class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20"
