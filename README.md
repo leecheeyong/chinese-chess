@@ -15,6 +15,8 @@ A web-based implementation of Chinese Chess (XiangQi) built with Vue. Play again
 
 ## Demo
 
+![](./public/demo.webp)
+
 Play online: [thexiangqi.vercel.app](https://thexiangqi.vercel.app)
 
 ## License
