@@ -10,6 +10,7 @@ const possibleMoves = ref([]);
 const lastMove = ref(null);
 const capturedPieces = ref({ red: [], black: [] });
 const showMoveLogMobile = ref(false);
+const autoFlipBoard = ref(true);
 
 const initializeBoard = () => {
   const board = Array(10)
@@ -395,6 +396,8 @@ const currentPlayerInCheck = computed(() => {
   return isKingInCheck(gameBoard.value, currentPlayer.value);
 });
 
+const isFlipped = computed(() => autoFlipBoard.value && currentPlayer.value === "black");
+
 const moveLogText = computed(() => {
   if (!gameHistory.value.length) return "No moves yet.";
   return gameHistory.value
@@ -656,6 +659,10 @@ const moveLogText = computed(() => {
             >
               ↶ Undo Move
             </button>
+            <div class="flex items-center mt-2">
+              <input id="flip-toggle" type="checkbox" v-model="autoFlipBoard" class="mr-2" />
+              <label for="flip-toggle" class="text-sm text-slate-200 select-none cursor-pointer">Auto Flip Board for Black</label>
+            </div>
           </div>
         </div>
         <div
@@ -707,7 +714,8 @@ const moveLogText = computed(() => {
           <div class="flex justify-center">
             <div class="inline-block bg-amber-100 rounded-lg p-4 shadow-2xl">
               <div
-                class="grid grid-cols-9 gap-0 border-4 border-amber-900 rounded-lg overflow-hidden"
+                class="grid grid-cols-9 gap-0 border-4 border-amber-900 rounded-lg overflow-hidden transition-transform duration-500 board-rotate-desktop"
+                :class="{ 'flipped-desktop': isFlipped }"
               >
                 <template v-for="(row, rowIndex) in gameBoard" :key="rowIndex">
                   <div
@@ -841,5 +849,13 @@ const moveLogText = computed(() => {
 
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.flipped-desktop {
+  transform: rotate(180deg);
+}
+
+.flipped-desktop .font-chinese {
+  transform: rotate(180deg);
 }
 </style>
