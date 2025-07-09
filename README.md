@@ -1,3 +1,5 @@
+<img src="/public/logo.png" width="200">
+
 # [Chinese Chess (XiangQi)](https://thexiangqi.vercel.app)
 
 A web-based implementation of Chinese Chess (XiangQi) built with Vue. Play against a friend locally, view move history, and enjoy a responsive, mobile-friendly interface.
