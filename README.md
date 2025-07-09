@@ -1,4 +1,4 @@
-<img src="/public/logo.png" width="200">
+<img src="/public/logo.png" width="150">
 
 # [Chinese Chess (XiangQi)](https://thexiangqi.vercel.app)
 
