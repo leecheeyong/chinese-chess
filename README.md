@@ -1,5 +1,21 @@
-# Vue 3 + Vite
+# [Chinese Chess (XiangQi)](https://thexiangqi.vercel.app)
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+A web-based implementation of Chinese Chess (XiangQi) built with Vue 3. Play against a friend locally, view move history, and enjoy a responsive, mobile-friendly interface.
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+## Features
+
+- Move validation for all pieces according to XiangQi rules
+- Move log with step-by-step history
+- Undo last move
+- Captured pieces display
+- Board auto-flips for black's turn (toggleable)
+- Responsive design for desktop and mobile
+
+## Demo
+
+Play online: [thexiangqi.vercel.app](https://thexiangqi.vercel.app)
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
