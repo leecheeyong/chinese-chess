@@ -40,7 +40,7 @@ const pieceDisplay = {
   车: { char: "車", color: "red", type: "chariot", name: "Chariot" },
   炮: { char: "炮", color: "red", type: "cannon", name: "Cannon" },
   兵: { char: "兵", color: "red", type: "soldier", name: "Soldier" },
-  尬: { char: "將", color: "black", type: "king", name: "General" },
+  將: { char: "將", color: "black", type: "king", name: "General" },
   士: { char: "士", color: "black", type: "advisor", name: "Advisor" },
   相: { char: "相", color: "black", type: "elephant", name: "Minister" },
   傌: { char: "傌", color: "black", type: "horse", name: "Horse" },
@@ -396,7 +396,9 @@ const currentPlayerInCheck = computed(() => {
   return isKingInCheck(gameBoard.value, currentPlayer.value);
 });
 
-const isFlipped = computed(() => autoFlipBoard.value && currentPlayer.value === "black");
+const isFlipped = computed(
+  () => autoFlipBoard.value && currentPlayer.value === "black",
+);
 
 const moveLogText = computed(() => {
   if (!gameHistory.value.length) return "No moves yet.";
@@ -660,8 +662,17 @@ const moveLogText = computed(() => {
               ↶ Undo Move
             </button>
             <div class="flex items-center mt-2">
-              <input id="flip-toggle" type="checkbox" v-model="autoFlipBoard" class="mr-2" />
-              <label for="flip-toggle" class="text-sm text-slate-200 select-none cursor-pointer">Auto Flip Board for Black</label>
+              <input
+                id="flip-toggle"
+                type="checkbox"
+                v-model="autoFlipBoard"
+                class="mr-2"
+              />
+              <label
+                for="flip-toggle"
+                class="text-sm text-slate-200 select-none cursor-pointer"
+                >Auto Flip Board for Black</label
+              >
             </div>
           </div>
         </div>
